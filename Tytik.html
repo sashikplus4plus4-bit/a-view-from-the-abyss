@@ -1,0 +1,1760 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>ВЗГЛЯД ИЗ БЕЗДНЫ - ПОЛНАЯ ВЕРСИЯ</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            background: #000;
+            color: #0f0;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            padding: 10px;
+        }
+        
+        canvas {
+            border: 3px solid #0f0;
+            background: #000;
+            display: block;
+            margin: 10px auto;
+            width: 800px;
+            height: 600px;
+        }
+        
+        .panel {
+            background: #111;
+            border: 2px solid #0f0;
+            padding: 10px;
+            margin: 10px 0;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            background: #000;
+            color: #0f0;
+            border: 2px solid #0f0;
+            padding: 8px 16px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: 0.2s;
+        }
+        
+        button:hover {
+            background: #0f0;
+            color: #000;
+            transform: scale(1.05);
+        }
+        
+        .money {
+            color: #ff0;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .level {
+            color: #0ff;
+            font-size: 20px;
+        }
+        
+        .eye-status {
+            color: #ff0;
+            font-size: 18px;
+        }
+        
+        .shop-btn {
+            background: #ff0;
+            color: #000;
+            border-color: #ff0;
+        }
+        
+        .gamma-btn {
+            background: #f0f;
+            color: #000;
+            border-color: #f0f;
+        }
+        
+        .level-btn {
+            background: #0ff;
+            color: #000;
+            border-color: #0ff;
+        }
+        
+        .difficulty-btn {
+            background: #f80;
+            color: #000;
+            border-color: #f80;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .modal.active {
+            display: block;
+        }
+        
+        .modal-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #111;
+            border: 3px solid #ff0;
+            border-radius: 15px;
+            padding: 20px;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #ff0;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .modal-header h2 {
+            color: #ff0;
+        }
+        
+        .close-btn {
+            background: #f00;
+            color: #fff;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .close-btn:hover {
+            background: #800;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            padding: 8px 16px;
+            border: 2px solid #ff0;
+            background: #000;
+            color: #ff0;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        
+        .tab.active {
+            background: #ff0;
+            color: #000;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .card {
+            background: #000;
+            border: 2px solid #0f0;
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            text-align: center;
+            transition: 0.2s;
+        }
+        
+        .card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 15px #0f0;
+        }
+        
+        .card.owned {
+            border-color: #ff0;
+        }
+        
+        .card.equipped {
+            border-color: #ff0;
+            background: #0a0a0a;
+            box-shadow: 0 0 20px #ff0;
+        }
+        
+        .preview {
+            height: 50px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        
+        .preview-small {
+            width: 30px;
+            height: 30px;
+            display: inline-block;
+            margin: 2px;
+            border: 1px solid #fff;
+        }
+        
+        .color-palette {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin: 10px 0;
+            padding: 10px;
+            background: #1a1a1a;
+            border-radius: 5px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        
+        .color-swatch {
+            width: 40px;
+            height: 40px;
+            border: 2px solid #fff;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        
+        .color-swatch:hover {
+            transform: scale(1.1);
+            border-color: #ff0;
+        }
+        
+        .creator-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .editor-section {
+            background: #000;
+            border: 2px solid #f0f;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        
+        .editor-section h3 {
+            color: #f0f;
+            margin-bottom: 15px;
+        }
+        
+        .field {
+            margin: 15px 0;
+        }
+        
+        .field label {
+            color: #0f0;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .field input, .field select {
+            width: 100%;
+            padding: 8px;
+            background: #1a1a1a;
+            color: #0f0;
+            border: 2px solid #f0f;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .save-btn {
+            background: #f0f;
+            color: #000;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        .list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 2px solid #0f0;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        
+        .list-item {
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #0f0;
+            border-radius: 3px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .list-item:hover {
+            background: #0f0;
+            color: #000;
+        }
+        
+        .list-item.selected {
+            background: #ff0;
+            color: #000;
+            border-color: #ff0;
+        }
+        
+        .map-editor {
+            display: grid;
+            grid-template-columns: repeat(20, 30px);
+            gap: 2px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        .map-cell {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #0f0;
+            cursor: pointer;
+        }
+        
+        .map-cell.wall {
+            background: #0a3a0a;
+        }
+        
+        .map-cell.floor {
+            background: #1a4a1a;
+        }
+        
+        .health-bar {
+            height: 3px;
+            background: #0f0;
+            position: relative;
+            top: -5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>👁️ ВЗГЛЯД ИЗ БЕЗДНЫ - ПОЛНАЯ ВЕРСИЯ 👁️</h1>
+    
+    <div class="panel">
+        <span class="money" id="score">💰 2000</span>
+        <span class="level" id="level">УРОВЕНЬ 1</span>
+        <span class="eye-status" id="eye">👁️ НЕ НАЙДЕНО</span>
+    </div>
+    
+    <div class="panel">
+        <button onclick="setDifficulty('easy')">🔰 ЛЕГКО</button>
+        <button onclick="setDifficulty('medium')">⚔️ СРЕДНЕ</button>
+        <button onclick="setDifficulty('hard')">🔥 СЛОЖНО</button>
+        <button onclick="setDifficulty('insane')">💀 БЕЗУМИЕ</button>
+        <button class="shop-btn" onclick="openShop()">🛒 МАГАЗИН</button>
+        <button class="gamma-btn" onclick="openGammaCreator()">🎨 ГАММЫ</button>
+        <button class="level-btn" onclick="openLevelEditor()">🗺️ УРОВНИ</button>
+        <button class="difficulty-btn" onclick="openDifficultyEditor()">⚡ СЛОЖНОСТИ</button>
+    </div>
+    
+    <canvas id="game" width="800" height="600"></canvas>
+    
+       <div class="panel">
+        <button onclick="move(0,-1)">⬆️</button>
+        <button onclick="move(-1,0)">⬅️</button>
+        <button onclick="move(1,0)">➡️</button>
+        <button onclick="move(0,1)">⬇️</button>
+        <button onclick="nextLevel()">⬆️ СЛЕД. УРОВЕНЬ</button>
+        <button onclick="reset()">🔄 НОВАЯ ИГРА</button>
+        <button onclick="hardReset()" style="background:#f00; color:#fff; border-color:#f00;">💀 ПОЛНЫЙ СБРОС</button>
+    </div>
+    
+   <!-- НОВАЯ ПАНЕЛЬ НАСТРОЕК ГЕНЕРАЦИИ -->
+    <div class="panel" style="background:#1a1a2a; border-color:#ff0;">
+        <span style="color:#ff0;">⚙️ ГЕНЕРАЦИЯ:</span>
+        <button onclick="toggleGeneration()" style="background:#00f; color:#fff; border-color:#0ff;" id="genToggleBtn">🔛 ВКЛ (30%)</button>
+        <button onclick="setGenerationChance(0.1)">10%</button>
+        <button onclick="setGenerationChance(0.3)">30%</button>
+        <button onclick="setGenerationChance(0.5)">50%</button>
+        <button onclick="setGenerationChance(0.7)">70%</button>
+        <button onclick="setGenerationChance(1.0)">100%</button>
+    </div>
+
+    <div class="panel">
+        <span>⬆️⬇️⬅️➡️ или WASD - движение</span>
+        <span style="color:#ff0;">👁️ Взгляд убивает врагов</span>
+    </div>
+
+    <!-- МАГАЗИН -->
+    <div class="modal" id="shopModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🛒 МАГАЗИН</h2>
+                <button class="close-btn" onclick="closeShop()">✕</button>
+            </div>
+            <div style="color:#ff0; font-size:20px; margin-bottom:15px;" id="shopMoney">💰 2000</div>
+            
+            <div class="tabs">
+                <div class="tab active" onclick="switchShopTab('gammas')">ГОТОВЫЕ ГАММЫ</div>
+                <div class="tab" onclick="switchShopTab('colors')">ОТДЕЛЬНЫЕ ЦВЕТА</div>
+                <div class="tab" onclick="switchShopTab('custom')">✨ СОЗДАТЬ ЦВЕТ</div>
+            </div>
+            
+            <div id="shopContent" class="grid"></div>
+        </div>
+    </div>
+
+    <!-- СОЗДАТЕЛЬ ГАММ -->
+    <div class="modal" id="gammaCreatorModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🎨 СОЗДАТЬ СВОЮ ГАММУ</h2>
+                <button class="close-btn" onclick="closeGammaCreator()">✕</button>
+            </div>
+            
+            <div class="creator-grid">
+                <div class="editor-section">
+                    <h3>ПРЕВЬЮ ГАММЫ</h3>
+                    <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin:20px 0;">
+                        <div>
+                            <div class="preview" id="previewPlayer" style="width:50px; height:50px; background:#0f0;"></div>
+                            <div>Игрок</div>
+                        </div>
+                        <div>
+                            <div class="preview" id="previewEnemy1" style="width:50px; height:50px; background:#f44;"></div>
+                            <div>Враг I</div>
+                        </div>
+                        <div>
+                            <div class="preview" id="previewEnemy2" style="width:50px; height:50px; background:#f80;"></div>
+                            <div>Враг II</div>
+                        </div>
+                        <div>
+                            <div class="preview" id="previewEnemy3" style="width:50px; height:50px; background:#f00;"></div>
+                            <div>Враг III</div>
+                        </div>
+                        <div>
+                            <div class="preview" id="previewWall" style="width:50px; height:50px; background:#0a3a0a;"></div>
+                            <div>Стена</div>
+                        </div>
+                        <div>
+                            <div class="preview" id="previewFloor" style="width:50px; height:50px; background:#1a4a1a;"></div>
+                            <div>Пол</div>
+                        </div>
+                        <div>
+                            <div class="preview" id="previewVisible" style="width:50px; height:50px; background:#2a5a2a;"></div>
+                            <div>Рамка</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="editor-section">
+                    <h3>НАСТРОЙКИ</h3>
+                    
+                    <div class="field">
+                        <label>Часть гаммы:</label>
+                        <select id="partSelect">
+                            <option value="player">Игрок</option>
+                            <option value="enemy1">Враг 1 уровня</option>
+                            <option value="enemy2">Враг 2 уровня</option>
+                            <option value="enemy3">Враг 3 уровня</option>
+                            <option value="wall">Стена</option>
+                            <option value="floor">Пол</option>
+                            <option value="visible">Рамка видимости</option>
+                        </select>
+                    </div>
+                    
+                    <div class="field">
+                        <label>Выбрать цвет:</label>
+                        <input type="color" id="colorPicker" value="#0f0" oninput="updatePreview()">
+                    </div>
+                    
+                    <div class="field">
+                        <label>Твои купленные цвета:</label>
+                        <div class="color-palette" id="ownedColorsPalette"></div>
+                    </div>
+                    
+                    <div class="field">
+                        <label>Название гаммы:</label>
+                        <input type="text" id="gammaName" placeholder="Моя гамма" value="Моя гамма">
+                    </div>
+                    
+                    <button class="save-btn" onclick="saveGamma()">💾 СОХРАНИТЬ ГАММУ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- РЕДАКТОР УРОВНЕЙ -->
+    <div class="modal" id="levelEditorModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🗺️ РЕДАКТОР УРОВНЕЙ</h2>
+                <button class="close-btn" onclick="closeLevelEditor()">✕</button>
+            </div>
+            
+            <div class="creator-grid">
+                <div class="editor-section">
+                    <h3>ТВОИ УРОВНИ</h3>
+                    <div class="list" id="levelsList"></div>
+                    <button onclick="loadLevel()" style="width:100%; margin:5px 0;">📂 ЗАГРУЗИТЬ</button>
+                    <button onclick="deleteLevel()" style="width:100%; background:#f00;">🗑️ УДАЛИТЬ</button>
+                </div>
+                
+                <div class="editor-section">
+                    <h3>СОЗДАТЬ УРОВЕНЬ</h3>
+                    
+                    <div class="field">
+                        <label>Название уровня:</label>
+                        <input type="text" id="levelName" placeholder="Мой уровень">
+                    </div>
+                    
+                    <div class="field">
+                        <label>Карта (кликай по клеткам):</label>
+                        <div id="mapEditor" class="map-editor"></div>
+                        <div style="display:flex; gap:5px; margin-top:5px;">
+                            <button onclick="randomMap()" style="flex:1;">🎲 СЛУЧАЙНАЯ</button>
+                            <button onclick="clearMap()" style="flex:1;">🗑️ ОЧИСТИТЬ</button>
+                        </div>
+                    </div>
+                    
+                    <div class="field">
+                        <label>Количество врагов:</label>
+                        <input type="number" id="enemyCount" min="0" max="50" value="5">
+                    </div>
+                    
+                    <div class="field">
+                        <label>Здоровье врагов:</label>
+                        <input type="number" id="enemyHp" min="1" max="20" value="3">
+                    </div>
+                    
+                    <div class="field">
+                        <label>Позиция игрока (x,y):</label>
+                        <input type="text" id="playerPos" placeholder="10,7" value="10,7">
+                    </div>
+                    
+                    <div class="field">
+                        <label>Позиция Ока (x,y):</label>
+                        <input type="text" id="eyePos" placeholder="15,10" value="15,10">
+                    </div>
+                    
+                    <button class="save-btn" onclick="saveLevel()">💾 СОХРАНИТЬ УРОВЕНЬ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- РЕДАКТОР СЛОЖНОСТИ -->
+    <div class="modal" id="difficultyEditorModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>⚡ РЕДАКТОР СЛОЖНОСТИ</h2>
+                <button class="close-btn" onclick="closeDifficultyEditor()">✕</button>
+            </div>
+            
+            <div class="creator-grid">
+                <div class="editor-section">
+                    <h3>ТВОИ СЛОЖНОСТИ</h3>
+                    <div class="list" id="difficultiesList"></div>
+                    <button onclick="loadDifficulty()" style="width:100%; margin:5px 0;">📂 ЗАГРУЗИТЬ</button>
+                    <button onclick="deleteDifficulty()" style="width:100%; background:#f00;">🗑️ УДАЛИТЬ</button>
+                </div>
+                
+                <div class="editor-section">
+                    <h3>СОЗДАТЬ СЛОЖНОСТЬ</h3>
+                    
+                    <div class="field">
+                        <label>Название сложности:</label>
+                        <input type="text" id="diffName" placeholder="Моя сложность">
+                    </div>
+                    
+                    <div class="field">
+                        <label>Врагов на 1 уровне:</label>
+                        <input type="number" id="baseEnemies" min="1" max="30" value="5">
+                    </div>
+                    
+                    <div class="field">
+                        <label>Рост врагов за уровень:</label>
+                        <input type="number" id="enemyGrowth" min="0" max="10" value="2" step="0.5">
+                    </div>
+                    
+                    <div class="field">
+                        <label>Базовое здоровье врагов:</label>
+                        <input type="number" id="baseHp" min="1" max="20" value="3">
+                    </div>
+                    
+                    <div class="field">
+                        <label>Рост здоровья за уровень:</label>
+                        <input type="number" id="hpGrowth" min="0" max="5" value="1" step="0.5">
+                    </div>
+                    
+                    <div class="field">
+                        <label>Урон взгляда:</label>
+                        <input type="number" id="gazeDamage" min="0.1" max="2" value="0.3" step="0.1">
+                    </div>
+                    
+                    <div class="field">
+                        <label>Радиус зрения:</label>
+                        <input type="number" id="vision" min="1" max="10" value="4">
+                    </div>
+                    
+                    <button class="save-btn" onclick="saveDifficulty()">💾 СОХРАНИТЬ СЛОЖНОСТЬ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+// ==================== ОСНОВНЫЕ НАСТРОЙКИ ====================
+let canvas = document.getElementById('game');
+let ctx = canvas.getContext('2d');
+
+let money = 2000;
+let level = 1;
+let currentDifficulty = 'medium';
+
+// ==================== НАСТРОЙКИ ГЕНЕРАЦИИ ====================
+let generationEnabled = true;      // Включена/выключена
+let generationChance = 0.3;        // Шанс появления (0.3 = 30%)
+
+// ==================== ГОТОВЫЕ ГАММЫ ====================
+const GAMMAS = [
+    {id: 'classic', name: '🌲 ЛЕСНАЯ', price: 0,
+     player:'#0f0', enemy1:'#f44', enemy2:'#f80', enemy3:'#f00',
+     wall:'#0a3a0a', floor:'#1a4a1a', visible:'#2a5a2a', dark:'#030'},
+    {id: 'fire', name: '🔥 ОГНЕННАЯ', price: 300,
+     player:'#ff0', enemy1:'#f80', enemy2:'#f40', enemy3:'#f00',
+     wall:'#3a1a0a', floor:'#4a2a1a', visible:'#f80', dark:'#2a0a00'},
+    {id: 'ice', name: '❄️ ЛЕДЯНАЯ', price: 400,
+     player:'#0ff', enemy1:'#8cf', enemy2:'#6af', enemy3:'#48f',
+     wall:'#1a3a3a', floor:'#2a4a4a', visible:'#6cf', dark:'#0a1a1a'},
+    {id: 'royal', name: '👑 КОРОЛЕВСКАЯ', price: 500,
+     player:'#f0f', enemy1:'#b537f2', enemy2:'#9b30d9', enemy3:'#7d26c1',
+     wall:'#2a1a3a', floor:'#3a2a4a', visible:'#b537f2', dark:'#1a0a2a'},
+    {id: 'gold', name: '⭐ ЗОЛОТАЯ', price: 600,
+     player:'#ff0', enemy1:'#fd0', enemy2:'#fb0', enemy3:'#f90',
+     wall:'#3a3a0a', floor:'#4a4a1a', visible:'#ff0', dark:'#1a1a0a'},
+    {id: 'blood', name: '🩸 КРОВАВАЯ', price: 700,
+     player:'#f44', enemy1:'#d22', enemy2:'#b00', enemy3:'#800',
+     wall:'#3a0a0a', floor:'#4a1a1a', visible:'#f44', dark:'#1a0000'},
+    {id: 'void', name: '🕳️ БЕЗДНА', price: 1000,
+     player:'#fff', enemy1:'#888', enemy2:'#555', enemy3:'#222',
+     wall:'#111', floor:'#222', visible:'#888', dark:'#000'}
+];
+
+// ==================== ГОТОВЫЕ ЦВЕТА ====================
+const COLORS = [
+    {id:'red', name:'Красный', color:'#f00', price:30},
+    {id:'blue', name:'Синий', color:'#00f', price:30},
+    {id:'yellow', name:'Жёлтый', color:'#ff0', price:30},
+    {id:'cyan', name:'Голубой', color:'#0ff', price:30},
+    {id:'magenta', name:'Пурпурный', color:'#f0f', price:30},
+    {id:'orange', name:'Оранжевый', color:'#f80', price:50},
+    {id:'purple', name:'Фиолетовый', color:'#80f', price:50},
+    {id:'lime', name:'Лайм', color:'#8f0', price:50},
+    {id:'pink', name:'Розовый', color:'#f8f', price:70},
+    {id:'gold', name:'Золотой', color:'#fd0', price:100}
+];
+
+// ==================== СТАНДАРТНЫЕ СЛОЖНОСТИ ====================
+const STANDARD_DIFFICULTIES = {
+    easy: { id:'easy', name:'🔰 ЛЕГКО', baseEnemies:3, enemyGrowth:1, baseHp:2, hpGrowth:0.5, gaze:0.5, vision:5 },
+    medium: { id:'medium', name:'⚔️ СРЕДНЕ', baseEnemies:5, enemyGrowth:2, baseHp:3, hpGrowth:1, gaze:0.3, vision:4 },
+    hard: { id:'hard', name:'🔥 СЛОЖНО', baseEnemies:7, enemyGrowth:3, baseHp:4, hpGrowth:1.5, gaze:0.2, vision:3 },
+    insane: { id:'insane', name:'💀 БЕЗУМИЕ', baseEnemies:10, enemyGrowth:4, baseHp:5, hpGrowth:2, gaze:0.15, vision:3 }
+};
+
+// ==================== КОЛЛЕКЦИИ ====================
+let ownedGammas = ['classic'];
+let ownedColors = ['#0f0','#f44','#f80','#f00','#0a3a0a','#1a4a1a','#2a5a2a'];
+let customGammas = [];
+let customColors = [];
+let customLevels = [];
+let customDifficulties = [];
+
+let currentGamma = GAMMAS[0];
+let selectedLevelIndex = -1;
+let selectedDifficultyIndex = -1;
+
+// ==================== ИГРОВЫЕ ПЕРЕМЕННЫЕ ====================
+let map = [];
+let enemies = [];
+let player = {x:10, y:7};
+let eye = {x:15, y:10, found:false};
+let gameOver = false;
+let gameWin = false;
+let usingCustomLevel = false;
+let currentCustomLevel = null;
+
+// ==================== ЗАГРУЗКА СОХРАНЕНИЙ ====================
+function loadSaveData() {
+    let save = localStorage.getItem('gazeOfTheAbyss');
+    if (save) {
+        try {
+            let data = JSON.parse(save);
+            money = data.money || 2000;
+            ownedGammas = data.ownedGammas || ['classic'];
+            ownedColors = data.ownedColors || ['#0f0','#f44','#f80','#f00','#0a3a0a','#1a4a1a','#2a5a2a'];
+            customGammas = data.customGammas || [];
+            customColors = data.customColors || [];
+            customLevels = data.customLevels || [];
+            customDifficulties = data.customDifficulties || [];
+        } catch (e) {
+            console.log('Ошибка загрузки');
+        }
+    }
+}
+
+function saveGameData() {
+    let data = {
+        money: money,
+        ownedGammas: ownedGammas,
+        ownedColors: ownedColors,
+        customGammas: customGammas,
+        customColors: customColors,
+        customLevels: customLevels,
+        customDifficulties: customDifficulties
+    };
+    localStorage.setItem('gazeOfTheAbyss', JSON.stringify(data));
+}
+
+// ==================== ГЕНЕРАЦИЯ КАРТЫ ====================
+function generateMap() {
+    if (usingCustomLevel && currentCustomLevel) {
+        map = JSON.parse(JSON.stringify(currentCustomLevel.map));
+        player = {...currentCustomLevel.player};
+        eye = {...currentCustomLevel.eye, found:false};
+    } else {
+        map = [];
+        for (let y=0; y<15; y++) {
+            let row = [];
+            for (let x=0; x<20; x++) {
+                row.push(Math.random()<0.25 ? '#' : '.');
+            }
+            map.push(row);
+        }
+        
+        player = {x:10, y:7};
+        if (map[7][10] === '#') {
+            for (let y=0; y<15; y++) {
+                for (let x=0; x<20; x++) {
+                    if (map[y][x] !== '#') {
+                        player.x = x;
+                        player.y = y;
+                        break;
+                    }
+                }
+            }
+        }
+        
+        eye = {x:15, y:10, found:false};
+        for (let i=0; i<100; i++) {
+            let x = Math.floor(Math.random()*20);
+            let y = Math.floor(Math.random()*15);
+            if (map[y][x] !== '#' && Math.abs(x-player.x)+Math.abs(y-player.y) > 5) {
+                eye = {x, y, found:false};
+                break;
+            }
+        }
+    }
+    
+    generateEnemies();
+    eye.found = false;
+    gameOver = false;
+    gameWin = false;
+    saveGameData();
+    draw();
+}
+
+function generateEnemies() {
+    let diff = getCurrentDifficulty();
+    let enemyCount = usingCustomLevel && currentCustomLevel ? 
+        currentCustomLevel.enemyCount : 
+        diff.baseEnemies + (level-1) * diff.enemyGrowth;
+    let enemyHp = usingCustomLevel && currentCustomLevel ? 
+        currentCustomLevel.enemyHp : 
+        diff.baseHp + (level-1) * diff.hpGrowth;
+    
+    enemies = [];
+    for (let i=0; i<enemyCount; i++) {
+        for (let j=0; j<100; j++) {
+            let x = Math.floor(Math.random()*20);
+            let y = Math.floor(Math.random()*15);
+            if (map[y][x] !== '#' && Math.abs(x-player.x)+Math.abs(y-player.y) > 4) {
+                enemies.push({
+                    x, y,
+                    hp: enemyHp,
+                    maxHp: enemyHp,
+                    level: Math.floor(Math.random()*3)+1
+                });
+                break;
+            }
+        }
+    }
+}
+
+function getCurrentDifficulty() {
+    if (currentDifficulty.startsWith('custom_')) {
+        let index = parseInt(currentDifficulty.replace('custom_', ''));
+        return customDifficulties[index] || STANDARD_DIFFICULTIES.medium;
+    }
+    return STANDARD_DIFFICULTIES[currentDifficulty] || STANDARD_DIFFICULTIES.medium;
+}
+// ==================== АЛГОРИТМ ПОИСКА ПУТИ (A*) ====================
+function findPath(start, goal) {
+    if (start.x === goal.x && start.y === goal.y) return null;
+    
+    let openSet = [start];
+    let cameFrom = new Map();
+    let gScore = new Map();
+    let fScore = new Map();
+    
+    let hash = (p) => `${p.x},${p.y}`;
+    gScore.set(hash(start), 0);
+    fScore.set(hash(start), heuristic(start, goal));
+    
+    while (openSet.length > 0) {
+        let current = openSet.reduce((a,b) => 
+            fScore.get(hash(a)) < fScore.get(hash(b)) ? a : b
+        );
+        
+        if (current.x === goal.x && current.y === goal.y) {
+            let path = [];
+            while (cameFrom.has(hash(current))) {
+                path.unshift(current);
+                current = cameFrom.get(hash(current));
+            }
+            return path.length > 0 ? path[0] : null;
+        }
+        
+        openSet = openSet.filter(p => p.x !== current.x || p.y !== current.y);
+        
+        let neighbors = [
+            {x: current.x+1, y: current.y},
+            {x: current.x-1, y: current.y},
+            {x: current.x, y: current.y+1},
+            {x: current.x, y: current.y-1}
+        ];
+        
+        for (let n of neighbors) {
+            if (n.x < 0 || n.x >= 20 || n.y < 0 || n.y >= 15) continue;
+            if (map[n.y][n.x] === '#') continue;
+            
+            let tentativeG = gScore.get(hash(current)) + 1;
+            
+            if (!gScore.has(hash(n)) || tentativeG < gScore.get(hash(n))) {
+                cameFrom.set(hash(n), current);
+                gScore.set(hash(n), tentativeG);
+                fScore.set(hash(n), tentativeG + heuristic(n, goal));
+                
+                if (!openSet.some(p => p.x === n.x && p.y === n.y)) {
+                    openSet.push(n);
+                }
+            }
+        }
+    }
+    return null;
+}
+
+function heuristic(a, b) {
+    return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+}
+
+// ==================== ДВИЖЕНИЕ ВРАГОВ ====================
+setInterval(() => {
+    if (gameOver || gameWin) return;
+    
+    for (let e of enemies) {
+        if (Math.random() > 0.3) continue;
+        
+        let next = findPath({x:e.x, y:e.y}, {x:player.x, y:player.y});
+        if (next) {
+            e.x = next.x;
+            e.y = next.y;
+        }
+        
+        if (e.x === player.x && e.y === player.y) {
+            gameOver = true;
+        }
+    }
+    draw();
+}, 600);
+
+// ==================== ВЗГЛЯД ====================
+setInterval(() => {
+    if (gameOver || gameWin) return;
+    let diff = getCurrentDifficulty();
+    let killed = false;
+    
+    for (let i=enemies.length-1; i>=0; i--) {
+        let e = enemies[i];
+        if (isVisible(e.x, e.y)) {
+            e.hp -= diff.gaze;
+            if (e.hp <= 0) {
+                enemies.splice(i, 1);
+                money += 25 + level*5;
+                killed = true;
+            }
+        }
+    }
+    
+    if (enemies.length === 0 && !gameWin) {
+        gameWin = true;
+        money += level*50;
+    }
+    saveGameData();
+    draw();
+}, 800);
+
+// ==================== ВИДИМОСТЬ ====================
+function isVisible(x, y) {
+    if (eye.found) return true;
+    let diff = getCurrentDifficulty();
+    let dist = Math.abs(x-player.x) + Math.abs(y-player.y);
+    return dist <= diff.vision;
+}
+
+// ==================== ПРОИЗВОЛЬНАЯ ГЕНЕРАЦИЯ ПРИ ДВИЖЕНИИ ====================
+function generateNewWalls() {
+    // Если генерация выключена - ничего не делаем
+    if (!generationEnabled) return;
+    
+    // НЕ применяем к пользовательским уровням
+    if (usingCustomLevel) return;
+    
+    let changes = 0;
+    
+    // Проходим по всей карте
+    for (let y = 0; y < 15; y++) {
+        for (let x = 0; x < 20; x++) {
+            // Если клетка НЕ видима и НЕ является позицией игрока
+            if (!isVisible(x, y) && !(x === player.x && y === player.y)) {
+                // Используем настроенный шанс
+                if (Math.random() < generationChance) {
+                    // Меняем стену на пол или наоборот
+                    if (map[y][x] === '#') {
+                        map[y][x] = '.'; // Стена становится полом
+                    } else {
+                        map[y][x] = '#'; // Пол становится стеной
+                    }
+                    changes++;
+                }
+            }
+        }
+    }
+    
+    if (changes > 0) {
+        draw(); // Перерисовываем если были изменения
+    }
+}
+
+// ==================== ДВИЖЕНИЕ ИГРОКА ====================
+function move(dx, dy) {
+    if (gameOver || gameWin) return;
+    
+    let nx = player.x + dx;
+    let ny = player.y + dy;
+    
+    if (nx < 0 || nx >= 20 || ny < 0 || ny >= 15) return;
+    if (map[ny][nx] === '#') return;
+    
+    player.x = nx;
+    player.y = ny;
+    
+    if (!eye.found && player.x === eye.x && player.y === eye.y) {
+        eye.found = true;
+        money += 100;
+    }
+    
+    for (let i=0; i<enemies.length; i++) {
+        if (player.x === enemies[i].x && player.y === enemies[i].y) {
+            enemies[i].hp -= 2;
+            if (enemies[i].hp <= 0) {
+                enemies.splice(i, 1);
+                money += 50;
+                i--;
+                if (enemies.length === 0) {
+                    gameWin = true;
+                    money += level*50;
+                }
+            }
+            break;
+        }
+    }
+    
+    // Вызываем генерацию новых стен
+    generateNewWalls();
+    
+    saveGameData();
+    draw();
+}
+
+// ==================== ОТРИСОВКА ====================
+function draw() {
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, 800, 600);
+    
+    for (let y=0; y<15; y++) {
+        for (let x=0; x<20; x++) {
+            if (isVisible(x, y)) {
+                ctx.fillStyle = map[y][x] === '#' ? currentGamma.wall : currentGamma.floor;
+                ctx.fillRect(x*40, y*40, 38, 38);
+                ctx.strokeStyle = currentGamma.visible;
+                ctx.strokeRect(x*40, y*40, 38, 38);
+            } else {
+                ctx.fillStyle = currentGamma.dark;
+                ctx.fillRect(x*40, y*40, 38, 38);
+            }
+        }
+    }
+    
+    // Лучи взгляда
+    for (let e of enemies) {
+        if (isVisible(e.x, e.y)) {
+            ctx.beginPath();
+            ctx.moveTo(player.x*40+20, player.y*40+20);
+            ctx.lineTo(e.x*40+20, e.y*40+20);
+            ctx.strokeStyle = '#ff0';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5,5]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+    }
+    
+    for (let e of enemies) {
+        if (isVisible(e.x, e.y)) {
+            let color = e.level === 1 ? currentGamma.enemy1 : (e.level === 2 ? currentGamma.enemy2 : currentGamma.enemy3);
+            ctx.fillStyle = color;
+            ctx.fillRect(e.x*40+4, e.y*40+4, 32, 32);
+            
+            let hpPercent = e.hp / e.maxHp;
+            ctx.fillStyle = hpPercent > 0.6 ? '#0f0' : (hpPercent > 0.3 ? '#ff0' : '#f00');
+            ctx.fillRect(e.x*40+5, e.y*40-5, 30 * hpPercent, 3);
+        }
+    }
+    
+    if (!eye.found && isVisible(eye.x, eye.y)) {
+        ctx.fillStyle = '#ff0';
+        ctx.beginPath();
+        ctx.arc(eye.x*40+20, eye.y*40+20, 15, 0, 2*Math.PI);
+        ctx.fill();
+        ctx.fillStyle = '#000';
+        ctx.font = 'bold 24px "Courier New"';
+        ctx.fillText('О', eye.x*40+12, eye.y*40+28);
+    }
+    
+    ctx.fillStyle = currentGamma.player;
+    ctx.shadowColor = currentGamma.player;
+    ctx.shadowBlur = 15;
+    ctx.beginPath();
+    ctx.arc(player.x*40+20, player.y*40+20, 15, 0, 2*Math.PI);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = '#000';
+    ctx.font = 'bold 24px "Courier New"';
+    ctx.fillText('@', player.x*40+12, player.y*40+28);
+    
+    if (gameOver || gameWin) {
+        ctx.fillStyle = 'rgba(0,0,0,0.7)';
+        ctx.fillRect(0, 0, 800, 600);
+        ctx.fillStyle = gameWin ? '#ff0' : '#f00';
+        ctx.font = 'bold 48px "Courier New"';
+        ctx.textAlign = 'center';
+        ctx.fillText(gameWin ? 'ПОБЕДА!' : 'ТЫ ПОГИБ', 400, 300);
+        ctx.textAlign = 'left';
+    }
+    
+    document.getElementById('score').innerHTML = `💰 ${money}`;
+    document.getElementById('level').innerHTML = `УРОВЕНЬ ${level}`;
+    document.getElementById('eye').innerHTML = eye.found ? '👁️ ВЕЧНОЕ ЗРЕНИЕ' : '👁️ НЕ НАЙДЕНО';
+}
+
+// ==================== МАГАЗИН ====================
+let currentShopTab = 'gammas';
+let shopModal = document.getElementById('shopModal');
+let shopContent = document.getElementById('shopContent');
+
+function openShop() {
+    updateShopDisplay();
+    shopModal.classList.add('active');
+}
+
+function closeShop() {
+    shopModal.classList.remove('active');
+}
+
+function switchShopTab(tab) {
+    currentShopTab = tab;
+    let tabs = document.querySelectorAll('#shopModal .tab');
+    tabs[0].className = tab === 'gammas' ? 'tab active' : 'tab';
+    tabs[1].className = tab === 'colors' ? 'tab active' : 'tab';
+    tabs[2].className = tab === 'custom' ? 'tab active' : 'tab';
+    updateShopDisplay();
+}
+
+function updateShopDisplay() {
+    let html = '';
+    if (currentShopTab === 'gammas') {
+        GAMMAS.forEach(g => {
+            let owned = ownedGammas.includes(g.id);
+            let equipped = currentGamma === g ? ' ✅' : '';
+            html += `
+                <div class="card ${owned ? 'owned' : ''} ${currentGamma === g ? 'equipped' : ''}" onclick="buyGamma('${g.id}')">
+                    <div class="preview" style="background:${g.player};"></div>
+                    <div>${g.name}${equipped}</div>
+                    <div style="color:#ff0;">${owned ? '✔ В КОЛЛЕКЦИИ' : '💰 ' + g.price}</div>
+                </div>
+            `;
+        });
+        customGammas.forEach((g, i) => {
+            let equipped = currentGamma === g ? ' ✅' : '';
+            html += `
+                <div class="card owned ${currentGamma === g ? 'equipped' : ''}" onclick="useCustomGamma(${i})">
+                    <div class="preview" style="background:${g.player};"></div>
+                    <div>${g.name} ✨${equipped}</div>
+                    <div style="color:#f0f;">СВОЯ ГАММА</div>
+                </div>
+            `;
+        });
+    } else if (currentShopTab === 'colors') {
+        COLORS.forEach(c => {
+            let owned = ownedColors.includes(c.color);
+            let isBaseColor = ['#0f0','#f44','#f80','#f00','#0a3a0a','#1a4a1a','#2a5a2a'].includes(c.color);
+            
+            if (owned) {
+                let sellPrice = Math.floor(c.price * 0.7);
+                html += `
+                    <div class="card owned" style="position:relative;">
+                        <div class="preview" style="background:${c.color};"></div>
+                        <div>${c.name}</div>
+                        <div style="color:#ff0;">✔ В КОЛЛЕКЦИИ</div>
+                        ${!isBaseColor ? 
+                            `<button onclick="sellColor('${c.id}')" style="margin-top:5px; background:#f00; color:#fff; border-color:#f00; width:100%;">💰 ПРОДАТЬ за ${sellPrice}</button>` 
+                            : '<div style="color:#888; margin-top:5px;">Базовый цвет</div>'}
+                    </div>
+                `;
+            } else {
+                html += `
+                    <div class="card" onclick="buyColor('${c.id}')">
+                        <div class="preview" style="background:${c.color};"></div>
+                        <div>${c.name}</div>
+                        <div style="color:#ff0;">💰 ${c.price}</div>
+                    </div>
+                `;
+            }
+        });
+    } else {
+        html += `
+            <div style="grid-column:1/-1; text-align:center; padding:20px;">
+                <h3>✨ СОЗДАТЬ СВОЙ ЦВЕТ (200💰)</h3>
+                <div style="margin:20px;">
+                    <input type="color" id="customColorPicker" value="#ff0000" style="width:100px; height:100px;">
+                </div>
+                <div style="margin:10px;">
+                    <input type="text" id="customColorName" placeholder="Название цвета" style="padding:8px; width:200px;">
+                </div>
+                <button onclick="createCustomColor()" style="padding:10px 20px;">💿 СОЗДАТЬ ЦВЕТ</button>
+            </div>
+        `;
+        customColors.forEach(c => {
+            let sellPrice = 140;
+            html += `
+                <div class="card owned" style="position:relative;">
+                    <div class="preview" style="background:${c.color};"></div>
+                    <div>${c.name} ✨</div>
+                    <div style="color:#ff0;">✔ В КОЛЛЕКЦИИ</div>
+                    <button onclick="sellCustomColor('${c.color}')" style="margin-top:5px; background:#f00; color:#fff; border-color:#f00; width:100%;">💰 ПРОДАТЬ за ${sellPrice}</button>
+                </div>
+            `;
+        });
+    }
+    shopContent.innerHTML = html;
+    document.getElementById('shopMoney').innerHTML = `💰 ${money}`;
+}
+
+function buyGamma(id) {
+    let gamma = GAMMAS.find(g => g.id === id);
+    if (!gamma) return;
+    
+    if (ownedGammas.includes(id)) {
+        currentGamma = gamma;
+        closeShop();
+        saveGameData();
+        draw();
+    } else if (money >= gamma.price) {
+        money -= gamma.price;
+        ownedGammas.push(id);
+        currentGamma = gamma;
+        closeShop();
+        saveGameData();
+        draw();
+    } else {
+        alert('Не хватает денег!');
+    }
+}
+
+function buyColor(id) {
+    let color = COLORS.find(c => c.id === id);
+    if (!color) return;
+    
+    if (ownedColors.includes(color.color)) {
+        alert('Этот цвет уже есть в коллекции!');
+    } else if (money >= color.price) {
+        money -= color.price;
+        ownedColors.push(color.color);
+        updateShopDisplay();
+        saveGameData();
+        draw();
+    } else {
+        alert('Не хватает денег!');
+    }
+}
+
+// ==================== ПРОДАЖА ЦВЕТА ====================
+function sellColor(id) {
+    let color = COLORS.find(c => c.id === id);
+    if (!color) return;
+    
+    let isBaseColor = ['#0f0','#f44','#f80','#f00','#0a3a0a','#1a4a1a','#2a5a2a'].includes(color.color);
+    
+    if (isBaseColor) {
+        alert('Нельзя продать базовый цвет классической гаммы!');
+        return;
+    }
+    
+    let usedInGammas = false;
+    for (let gamma of customGammas) {
+        if (gamma.player === color.color || 
+            gamma.enemy1 === color.color || 
+            gamma.enemy2 === color.color || 
+            gamma.enemy3 === color.color || 
+            gamma.wall === color.color || 
+            gamma.floor === color.color || 
+            gamma.visible === color.color) {
+            usedInGammas = true;
+            break;
+        }
+    }
+    
+    if (usedInGammas) {
+        alert('Нельзя продать цвет, который используется в созданных гаммах!');
+        return;
+    }
+    
+    let sellPrice = Math.floor(color.price * 0.7);
+    
+    if (confirm(`Продать цвет "${color.name}" за ${sellPrice}💰?`)) {
+        let index = ownedColors.indexOf(color.color);
+        if (index > -1) {
+            ownedColors.splice(index, 1);
+            money += sellPrice;
+            saveGameData();
+            updateShopDisplay();
+            draw();
+        }
+    }
+}
+
+// ==================== ПРОДАЖА СОЗДАННОГО ЦВЕТА ====================
+function sellCustomColor(colorValue) {
+    console.log('Продажа цвета:', colorValue);
+    
+    let customColorIndex = -1;
+    let customColor = null;
+    
+    for (let i = 0; i < customColors.length; i++) {
+        if (customColors[i].color === colorValue) {
+            customColorIndex = i;
+            customColor = customColors[i];
+            break;
+        }
+    }
+    
+    if (customColorIndex === -1 || !customColor) {
+        alert('Цвет не найден!');
+        return;
+    }
+    
+    let usedInGammas = false;
+    for (let gamma of customGammas) {
+        if (gamma.player === colorValue || 
+            gamma.enemy1 === colorValue || 
+            gamma.enemy2 === colorValue || 
+            gamma.enemy3 === colorValue || 
+            gamma.wall === colorValue || 
+            gamma.floor === colorValue || 
+            gamma.visible === colorValue) {
+            usedInGammas = true;
+            break;
+        }
+    }
+    
+    if (usedInGammas) {
+        alert('Нельзя продать цвет, который используется в созданных гаммах!');
+        return;
+    }
+    
+    if (confirm(`Продать созданный цвет "${customColor.name}" за 140💰?`)) {
+        customColors.splice(customColorIndex, 1);
+        
+        let index = ownedColors.indexOf(colorValue);
+        if (index > -1) {
+            ownedColors.splice(index, 1);
+        } else {
+            for (let i = 0; i < ownedColors.length; i++) {
+                if (ownedColors[i].toLowerCase() === colorValue.toLowerCase()) {
+                    ownedColors.splice(i, 1);
+                    break;
+                }
+            }
+        }
+        
+        money += 140;
+        saveGameData();
+        updateShopDisplay();
+        draw();
+        
+        alert(`Цвет "${customColor.name}" продан! +140💰`);
+    }
+}
+
+function createCustomColor() {
+    let color = document.getElementById('customColorPicker').value;
+    let name = document.getElementById('customColorName').value || 'Мой цвет';
+    
+    if (money >= 200) {
+        money -= 200;
+        customColors.push({name, color});
+        ownedColors.push(color);
+        updateShopDisplay();
+        saveGameData();
+        draw();
+        alert(`Цвет "${name}" создан! -200💰`);
+    } else {
+        alert('Не хватает денег! Нужно 200💰');
+    }
+}
+function useCustomGamma(index) {
+    if (index >= 0 && index < customGammas.length) {
+        currentGamma = customGammas[index];
+        closeShop();
+        saveGameData();
+        draw();
+        alert(`✅ Гамма "${customGammas[index].name}" надета!`);
+    } else {
+        alert('Ошибка: гамма не найдена');
+    }
+}
+
+// ==================== СОЗДАТЕЛЬ ГАММ ====================
+let gammaCreatorModal = document.getElementById('gammaCreatorModal');
+
+function openGammaCreator() {
+    updateOwnedColorsPalette();
+    gammaCreatorModal.classList.add('active');
+}
+
+function closeGammaCreator() {
+    gammaCreatorModal.classList.remove('active');
+}
+
+function updateOwnedColorsPalette() {
+    let container = document.getElementById('ownedColorsPalette');
+    let html = '';
+    
+    // Показываем ТОЛЬКО купленные цвета
+    ownedColors.forEach(color => {
+        html += `<div class="color-swatch" style="background:${color};" onclick="selectColor('${color}')" title="${color}"></div>`;
+    });
+    
+    container.innerHTML = html;
+}
+
+function selectColor(color) {
+    // Получаем текущую выбранную часть
+    let part = document.getElementById('partSelect').value;
+    
+    // Применяем цвет напрямую к превью
+    document.getElementById('preview' + part.charAt(0).toUpperCase() + part.slice(1)).style.backgroundColor = color;
+}
+
+function updatePreview() {
+    // Эта функция больше не нужна, так как мы убрали colorPicker
+    // Можно удалить или оставить пустой
+}
+
+function saveGamma() {
+    let name = document.getElementById('gammaName').value;
+    if (!name) name = 'Моя гамма';
+    
+    // Получаем цвета из превью
+    let colors = [
+        document.getElementById('previewPlayer').style.backgroundColor,
+        document.getElementById('previewEnemy1').style.backgroundColor,
+        document.getElementById('previewEnemy2').style.backgroundColor,
+        document.getElementById('previewEnemy3').style.backgroundColor,
+        document.getElementById('previewWall').style.backgroundColor,
+        document.getElementById('previewFloor').style.backgroundColor,
+        document.getElementById('previewVisible').style.backgroundColor
+    ];
+    
+    // Функция конвертации RGB в HEX
+    function rgbToHex(rgb) {
+        if (!rgb) return '#0f0';
+        if (rgb.startsWith('#')) return rgb;
+        
+        let match = rgb.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+        if (!match) return '#0f0';
+        
+        let r = parseInt(match[1]).toString(16).padStart(2, '0');
+        let g = parseInt(match[2]).toString(16).padStart(2, '0');
+        let b = parseInt(match[3]).toString(16).padStart(2, '0');
+        
+        return `#${r}${g}${b}`;
+    }
+    
+    // Конвертируем все цвета
+    let hexColors = colors.map(c => rgbToHex(c));
+    
+    // Создаём новую гамму (БЕЗ ПРОВЕРКИ)
+    let newGamma = {
+        name: name,
+        player: hexColors[0],
+        enemy1: hexColors[1],
+        enemy2: hexColors[2],
+        enemy3: hexColors[3],
+        wall: hexColors[4],
+        floor: hexColors[5],
+        visible: hexColors[6],
+        dark: '#030'
+    };
+    
+    customGammas.push(newGamma);
+    currentGamma = newGamma;
+    closeGammaCreator();
+    saveGameData();
+    draw();
+    
+    alert(`✅ Гамма "${name}" создана!`);
+}
+function rgbToHex(rgb) {
+    if (rgb.startsWith('#')) return rgb;
+    let match = rgb.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+    if (!match) return '#000000';
+    return '#' + ((1 << 24) + (parseInt(match[1]) << 16) + (parseInt(match[2]) << 8) + parseInt(match[3])).toString(16).slice(1);
+}
+
+// ==================== РЕДАКТОР УРОВНЕЙ ====================
+let levelEditorModal = document.getElementById('levelEditorModal');
+let mapEditor = document.getElementById('mapEditor');
+let editingMap = [];
+
+function openLevelEditor() {
+    updateLevelsList();
+    initMapEditor();
+    levelEditorModal.classList.add('active');
+}
+
+function closeLevelEditor() {
+    levelEditorModal.classList.remove('active');
+}
+
+function updateLevelsList() {
+    let list = document.getElementById('levelsList');
+    let html = '';
+    customLevels.forEach((level, index) => {
+        html += `<div class="list-item" onclick="selectLevel(${index})">${level.name}</div>`;
+    });
+    list.innerHTML = html || '<div style="color:#888;">Нет сохранённых уровней</div>';
+}
+
+function selectLevel(index) {
+    selectedLevelIndex = index;
+    document.querySelectorAll('.list-item').forEach((item, i) => {
+        item.className = i === index ? 'list-item selected' : 'list-item';
+    });
+}
+
+function initMapEditor() {
+    editingMap = [];
+    for (let y=0; y<15; y++) {
+        let row = [];
+        for (let x=0; x<20; x++) {
+            row.push('.');
+        }
+        editingMap.push(row);
+    }
+    renderMapEditor();
+}
+
+function renderMapEditor() {
+    let html = '';
+    for (let y=0; y<15; y++) {
+        for (let x=0; x<20; x++) {
+            html += `<div class="map-cell ${editingMap[y][x] === '#' ? 'wall' : 'floor'}" onclick="toggleMapCell(${x},${y})"></div>`;
+        }
+    }
+    mapEditor.innerHTML = html;
+}
+
+function toggleMapCell(x, y) {
+    editingMap[y][x] = editingMap[y][x] === '#' ? '.' : '#';
+    renderMapEditor();
+}
+
+function randomMap() {
+    for (let y=0; y<15; y++) {
+        for (let x=0; x<20; x++) {
+            editingMap[y][x] = Math.random() < 0.25 ? '#' : '.';
+        }
+    }
+    renderMapEditor();
+}
+
+function clearMap() {
+    for (let y=0; y<15; y++) {
+        for (let x=0; x<20; x++) {
+            editingMap[y][x] = '.';
+        }
+    }
+    renderMapEditor();
+}
+
+function saveLevel() {
+    let name = document.getElementById('levelName').value;
+    if (!name) {
+        alert('Введите название уровня!');
+        return;
+    }
+    
+    let playerPos = document.getElementById('playerPos').value.split(',').map(Number);
+    let eyePos = document.getElementById('eyePos').value.split(',').map(Number);
+    
+    let level = {
+        name: name,
+        map: JSON.parse(JSON.stringify(editingMap)),
+        player: {x: playerPos[0], y: playerPos[1]},
+        eye: {x: eyePos[0], y: eyePos[1]},
+        enemyCount: parseInt(document.getElementById('enemyCount').value),
+        enemyHp: parseInt(document.getElementById('enemyHp').value)
+    };
+    
+    customLevels.push(level);
+    updateLevelsList();
+    saveGameData();
+    alert('Уровень сохранён!');
+}
+
+function loadLevel() {
+    if (selectedLevelIndex === -1) {
+        alert('Выбери уровень из списка!');
+        return;
+    }
+    currentCustomLevel = customLevels[selectedLevelIndex];
+    usingCustomLevel = true;
+    closeLevelEditor();
+    generateMap();
+}
+
+function deleteLevel() {
+    if (selectedLevelIndex === -1) {
+        alert('Выбери уровень из списка!');
+        return;
+    }
+    customLevels.splice(selectedLevelIndex, 1);
+    selectedLevelIndex = -1;
+    updateLevelsList();
+    saveGameData();
+}
+
+// ==================== РЕДАКТОР СЛОЖНОСТИ ====================
+let difficultyEditorModal = document.getElementById('difficultyEditorModal');
+
+function openDifficultyEditor() {
+    updateDifficultiesList();
+    difficultyEditorModal.classList.add('active');
+}
+
+function closeDifficultyEditor() {
+    difficultyEditorModal.classList.remove('active');
+}
+
+function updateDifficultiesList() {
+    let list = document.getElementById('difficultiesList');
+    let html = '';
+    customDifficulties.forEach((diff, index) => {
+        html += `<div class="list-item" onclick="selectDifficulty(${index})">${diff.name}</div>`;
+    });
+    list.innerHTML = html || '<div style="color:#888;">Нет созданных сложностей</div>';
+}
+
+function selectDifficulty(index) {
+    selectedDifficultyIndex = index;
+    document.querySelectorAll('#difficultiesList .list-item').forEach((item, i) => {
+        item.className = i === index ? 'list-item selected' : 'list-item';
+    });
+}
+
+function saveDifficulty() {
+    let name = document.getElementById('diffName').value;
+    if (!name) {
+        alert('Введите название сложности!');
+        return;
+    }
+    
+    let difficulty = {
+        id: 'custom_' + customDifficulties.length,
+        name: name,
+        baseEnemies: parseInt(document.getElementById('baseEnemies').value),
+        enemyGrowth: parseFloat(document.getElementById('enemyGrowth').value),
+        baseHp: parseInt(document.getElementById('baseHp').value),
+        hpGrowth: parseFloat(document.getElementById('hpGrowth').value),
+        gaze: parseFloat(document.getElementById('gazeDamage').value),
+        vision: parseInt(document.getElementById('vision').value)
+    };
+    
+    customDifficulties.push(difficulty);
+    updateDifficultiesList();
+    saveGameData();
+    alert('Сложность сохранена!');
+}
+
+function loadDifficulty() {
+    if (selectedDifficultyIndex === -1) {
+        alert('Выбери сложность из списка!');
+        return;
+    }
+    currentDifficulty = 'custom_' + selectedDifficultyIndex;
+    closeDifficultyEditor();
+    generateMap();
+}
+
+function deleteDifficulty() {
+    if (selectedDifficultyIndex === -1) {
+        alert('Выбери сложность из списка!');
+        return;
+    }
+    customDifficulties.splice(selectedDifficultyIndex, 1);
+    selectedDifficultyIndex = -1;
+    updateDifficultiesList();
+    saveGameData();
+}
+
+// ==================== УПРАВЛЕНИЕ ====================
+function setDifficulty(diff) {
+    currentDifficulty = diff;
+    usingCustomLevel = false;
+    generateMap();
+}
+
+function nextLevel() {
+    if (gameWin) {
+        level++;
+        // Сбрасываем флаг пользовательского уровня при переходе
+        usingCustomLevel = false;
+        currentCustomLevel = null;
+        generateMap();
+    } else if (gameOver) {
+        reset();
+    }
+}
+
+function reset() {
+    level = 1;
+    money = 0;
+    usingCustomLevel = false;
+    currentCustomLevel = null;
+    generateMap();
+}
+// ==================== ПОЛНЫЙ СБРОС ИГРЫ ====================
+function hardReset() {
+    if (confirm('💀 ВНИМАНИЕ! 💀\n\nЭто удалит:\n• Все купленные гаммы\n• Все купленные цвета\n• Все созданные гаммы\n• Все созданные уровни\n• Все созданные сложности\n\nВы уверены?')) {
+        
+        // Очищаем localStorage
+        localStorage.removeItem('gazeOfTheAbyss');
+        
+        // Сбрасываем все переменные
+        money = 0;
+        level = 1;
+        currentDifficulty = 'medium';
+        
+        ownedGammas = ['classic'];
+        ownedColors = ['#0f0','#f44','#f80','#f00','#0a3a0a','#1a4a1a','#2a5a2a'];
+        customGammas = [];
+        customColors = [];
+        customLevels = [];
+        customDifficulties = [];
+        
+        currentGamma = GAMMAS[0];
+        usingCustomLevel = false;
+        currentCustomLevel = null;
+        
+        // Перезапускаем игру
+        generateMap();
+        
+        alert('✅ Игра полностью сброшена!');
+    }
+}
+
+
+// ==================== УПРАВЛЕНИЕ ГЕНЕРАЦИЕЙ ====================
+function toggleGeneration() {
+    generationEnabled = !generationEnabled;
+    let btn = document.getElementById('genToggleBtn');
+    let chancePercent = Math.round(generationChance * 100);
+    
+    if (generationEnabled) {
+        btn.innerHTML = `🔛 ВКЛ (${chancePercent}%)`;
+        btn.style.background = '#00f';
+    } else {
+        btn.innerHTML = `🔴 ВЫКЛ`;
+        btn.style.background = '#f00';
+    }
+    
+    alert(`Генерация ${generationEnabled ? 'включена' : 'выключена'}`);
+}
+
+function setGenerationChance(chance) {
+    generationChance = chance;
+    let btn = document.getElementById('genToggleBtn');
+    let chancePercent = Math.round(chance * 100);
+    
+    if (generationEnabled) {
+        btn.innerHTML = `🔛 ВКЛ (${chancePercent}%)`;
+    }
+    
+    alert(`Шанс генерации установлен на ${chancePercent}%`);
+}
+
+// ==================== ЗАПУСК ====================
+loadSaveData();
+generateMap();
+
+window.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowUp' || e.key === 'w') move(0, -1);
+    if (e.key === 'ArrowDown' || e.key === 's') move(0, 1);
+    if (e.key === 'ArrowLeft' || e.key === 'a') move(-1, 0);
+    if (e.key === 'ArrowRight' || e.key === 'd') move(1, 0);
+});
+
+window.addEventListener('beforeunload', () => {
+    saveGameData();
+});
+</script>
+</body>
+</html>
